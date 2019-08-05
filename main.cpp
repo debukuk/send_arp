@@ -47,6 +47,27 @@ void printIp(char *sender_ip, char *target_ip){
 	printf("---      END      ---\n");
 }
 
+void arpRequest(pcap_t *handle, unsigned char *packet, arp_header arp, in_addr iaddr, u_int8_t *sender_mac, u_int8_t *target_mac, char *sender_ip, char *target_ip){
+	// struct arp header
+	arp.hd_type = htons(0x01);
+	arp.proto_type = htons(0x0800);
+	arp.hd_size = 0x06;
+	arp.proto_size = 4;
+	arp.opcode = htons(0x01);
+	memcpy(arp.sender_mac, sender_mac, 6);
+	memcpy(arp.target_mac, target_mac, 6);
+	inet_pton(AF_INET, sender_ip, &iaddr.s_addr);
+	memcpy(arp.sender_ip, &iaddr.s_addr, sizeof(arp.sender_ip));
+	inet_pton(AF_INET, target_ip, &iaddr.s_addr);
+	memcpy(arp.target_ip, &iaddr.s_addr, sizeof(arp.target_ip));
+
+	memcpy(packet + len, &arp, sizeof(arp));
+	len += sizeof(arp);
+
+	// arp packet request
+	pcap_sendpacket(handle, packet, len);
+}
+
 int main(int argc, char *argv[]) {
 	if (argc != 4) { // length of argc should be 4
 		usage();
@@ -97,25 +118,8 @@ int main(int argc, char *argv[]) {
 	memcpy(packet, &ether, sizeof(ether));
 	len += sizeof(ether);
 
-	// struct arp header
-	arp.hd_type = htons(0x01);
-	arp.proto_type = htons(0x0800);
-	arp.hd_size = 6; // length of hardware address size (mac)
-	arp.proto_size = 4; // length of protocol address size (ip)
-	arp.opcode = htons(0x01);
-	memcpy(arp.sender_mac, sender_mac, 0x6);
-	memset(arp.target_mac, 0x0, 0x6);
-	inet_pton(AF_INET, sender_ip, &iaddr.s_addr);
-	memcpy(arp.sender_ip, &iaddr.s_addr, sizeof(arp.sender_ip));
-	inet_pton(AF_INET, target_ip, &iaddr.s_addr);
-	memcpy(arp.target_ip, &iaddr.s_addr, sizeof(arp.target_ip));
-
-	memcpy(packet + len, &arp, sizeof(arp));
-	len += sizeof(arp);
-
-	// arp packet request
-	pcap_sendpacket(handle, packet, len);
-
+	arpRequest(handle, packet, arp, iaddr, sender_mac, target_mac, sender_ip, target_ip); // request with arp
+	
 	// get target mac address
 	int if_next_exist = 0;
 
@@ -141,24 +145,7 @@ int main(int argc, char *argv[]) {
 	memcpy(packet, &ether, sizeof(ether));
 	len += sizeof(ether);
 
-	// struct arp header
-	arp.hd_type = htons(0x01);
-	arp.proto_type = htons(0x0800);
-	arp.hd_size = 0x06;
-	arp.proto_size = 4;
-	arp.opcode = htons(0x01);
-	memcpy(arp.sender_mac, sender_mac, 6);
-	memcpy(arp.target_mac, target_mac, 6);
-	inet_pton(AF_INET, sender_ip, &iaddr.s_addr);
-	memcpy(arp.sender_ip, &iaddr.s_addr, sizeof(arp.sender_ip));
-	inet_pton(AF_INET, target_ip, &iaddr.s_addr);
-	memcpy(arp.target_ip, &iaddr.s_addr, sizeof(arp.target_ip));
-
-	memcpy(packet + len, &arp, sizeof(arp));
-	len += sizeof(arp);
-
-	// arp packet request
-	pcap_sendpacket(handle, packet, len);
+	arpRequest(handle, packet, arp, iaddr, sender_mac, target_mac, sender_ip, target_ip); // request with arp
 	
 	printMac(sender_mac, target_mac);
 	printIp(sender_ip, target_ip);
