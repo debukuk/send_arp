@@ -35,6 +35,18 @@ void usage(){ // print about how to use
 	printf("example: send_arp ens33 192.20.10.5 192.20.10.2\n");	
 }
 
+void printMac(u_int8_t *sender_mac, u_int8_t *target_mac){
+	printf("--- Final Results ---\n");
+	printf("  Sender's Mac Address: %02x:%02x:%02x:%02x:%02x:%02x\n", sender_mac[0], sender_mac[1], sender_mac[2], sender_mac[3], sender_mac[4], sender_mac[5]);
+	printf("  Target's Mac Address: %02x:%02x:%02x:%02x:%02x:%02x\n", target_mac[0], target_mac[1], target_mac[2], target_mac[3], target_mac[4], target_mac[5]);
+}
+
+void printIp(char *sender_ip, char *target_ip){
+	printf("  Sender's IP Address:  %d.%d.%d.%d\n", sender_ip[0], sender_ip[1], sender_ip[2], sender_ip[3]);
+	printf("  Target's IP Address:  %d.%d.%d.%d\n", target_ip[0], target_ip[1], target_ip[2], target_ip[3]);
+	printf("---      END      ---\n");
+}
+
 int main(int argc, char *argv[]) {
 	if (argc != 4) { // length of argc should be 4
 		usage();
@@ -43,9 +55,9 @@ int main(int argc, char *argv[]) {
 	char *interface = argv[1];
 	char *sender_ip = argv[2];
 	char *target_ip = argv[3];
-	char error_buf[256];
+	char error_buf[256] = {'\0',};
 
-	unsigned char packet[PACKET_LENGTH];
+	unsigned char packet[PACKET_LENGTH] = {'\0',};
 
 	eth_header ether;
 	arp_header arp;
@@ -147,13 +159,9 @@ int main(int argc, char *argv[]) {
 
 	// arp packet request
 	pcap_sendpacket(handle, packet, len);
-
-	printf("--- Final Results ---\n");
-	printf("  Sender's Mac Address: %02x:%02x:%02x:%02x:%02x:%02x\n", sender_mac[0], sender_mac[1], sender_mac[2], sender_mac[3], sender_mac[4], sender_mac[5]);
-	printf("  Target's Mac Address: %02x:%02x:%02x:%02x:%02x:%02x\n", target_mac[0], target_mac[1], target_mac[2], target_mac[3], target_mac[4], target_mac[5]);
-	printf("  Sender's IP Address:  %d.%d.%d.%d\n", sender_ip[0], sender_ip[1], sender_ip[2], sender_ip[3]);
-	printf("  Target's IP Address:  %d.%d.%d.%d\n", target_ip[0], target_ip[1], target_ip[2], target_ip[3]);
-	printf("---      END      ---\n");
+	
+	printMac(sender_mac, target_mac);
+	printIp(sender_ip, target_ip);
 
 	return 0;
 }
