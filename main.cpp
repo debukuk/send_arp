@@ -153,7 +153,7 @@ int main(int argc, char *argv[]) {
 	printf("  Target's Mac Address: %02x:%02x:%02x:%02x:%02x:%02x\n", target_mac[0], target_mac[1], target_mac[2], target_mac[3], target_mac[4], target_mac[5]);
 	printf("  Sender's IP Address:  %d.%d.%d.%d\n", sender_ip[0], sender_ip[1], sender_ip[2], sender_ip[3]);
 	printf("  Target's IP Address:  %d.%d.%d.%d\n", target_ip[0], target_ip[1], target_ip[2], target_ip[3]);
-	printf("---      END      ---");
+	printf("---      END      ---\n");
 
 	return 0;
 }
