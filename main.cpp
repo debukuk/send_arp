@@ -148,7 +148,7 @@ int main(int argc, char *argv[]) {
 	// arp packet request
 	pcap_sendpacket(handle, packet, len);
 
-	printf("--- Final Results --- ");
+	printf("--- Final Results --- \");
 	printf("  Sender's Mac Address: %02x:%02x:%02x:%02x:%02x:%02x\n", sender_mac[0], sender_mac[1], sender_mac[2], sender_mac[3], sender_mac[4], sender_mac[5]);
 	printf("  Target's Mac Address: %02x:%02x:%02x:%02x:%02x:%02x\n", target_mac[0], target_mac[1], target_mac[2], target_mac[3], target_mac[4], target_mac[5]);
 	printf("  Sender's IP Address:  %d.%d.%d.%d\n", sender_ip[0], sender_ip[1], sender_ip[2], sender_ip[3]);
