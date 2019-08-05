@@ -9,6 +9,8 @@
 #include <sys/socket.h>
 
 #define PACKET_LENGTH 42
+#define ARP 0x0806
+#define PROTOTYPE 0x0800
 
 unsigned int len = 0;
 
@@ -50,7 +52,7 @@ void printIp(char *sender_ip, char *target_ip){
 void arpRequest(pcap_t *handle, unsigned char *packet, arp_header arp, in_addr iaddr, u_int8_t *sender_mac, u_int8_t *target_mac, char *sender_ip, char *target_ip){
 	// struct arp header
 	arp.hd_type = htons(0x01);
-	arp.proto_type = htons(0x0800);
+	arp.proto_type = htons(PROTOTYPE);
 	arp.hd_size = 0x06;
 	arp.proto_size = 4;
 	arp.opcode = htons(0x01);
@@ -113,7 +115,7 @@ int main(int argc, char *argv[]) {
 	// do broad cast
 	memset(ether.dhost_mac, 0xff, sizeof(ether.dhost_mac));
 	memcpy(ether.shost_mac, sender_mac, 6); // mac address has 6 bytes
-	ether.type = htons(0x0806);
+	ether.type = htons(ARP);
 
 	memcpy(packet, &ether, sizeof(ether));
 	len += sizeof(ether);
@@ -140,7 +142,7 @@ int main(int argc, char *argv[]) {
 	// struct ethernet header
 	memcpy(ether.dhost_mac, target_mac, 6);   
 	memcpy(ether.shost_mac, sender_mac, 6);
-	ether.type = htons(0x0806);
+	ether.type = htons(ARP);
 
 	memcpy(packet, &ether, sizeof(ether));
 	len += sizeof(ether);
